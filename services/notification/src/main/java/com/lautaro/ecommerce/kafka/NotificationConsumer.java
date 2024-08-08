@@ -1,6 +1,5 @@
 package com.lautaro.ecommerce.kafka;
 
-
 import com.lautaro.ecommerce.email.EmailService;
 import com.lautaro.ecommerce.kafka.order.OrderConfirmation;
 import com.lautaro.ecommerce.kafka.payment.PaymentConfirmation;
@@ -18,7 +17,6 @@ import static com.lautaro.ecommerce.notification.NotificationType.ORDER_CONFIRMA
 import static com.lautaro.ecommerce.notification.NotificationType.PAYMENT_CONFIRMATION;
 import static java.lang.String.format;
 
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -26,7 +24,10 @@ public class NotificationConsumer {
 
     private final NotificationRepository repository;
     private final EmailService emailService;
-    @KafkaListener(topics = "payment-topic")
+
+
+
+    @KafkaListener(topics = "payment-topic", containerFactory = "paymentConfirmationKafkaListenerContainerFactory")
     public void consumePaymentSuccessNotifications(PaymentConfirmation paymentConfirmation) throws MessagingException {
         log.info(format("Consuming the message from payment-topic Topic:: %s", paymentConfirmation));
         repository.save(
@@ -45,7 +46,7 @@ public class NotificationConsumer {
         );
     }
 
-    @KafkaListener(topics = "order-topic")
+    @KafkaListener(topics = "order-topic", containerFactory = "orderConfirmationKafkaListenerContainerFactory")
     public void consumeOrderConfirmationNotifications(OrderConfirmation orderConfirmation) throws MessagingException {
         log.info(format("Consuming the message from order-topic Topic:: %s", orderConfirmation));
         repository.save(
